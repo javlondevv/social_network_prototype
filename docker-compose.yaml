@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  web_service:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+    - '8005:8001'
+    env_file: ./.env-compose
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    depends_on:
+      - postgres
+      - minio
+
+  postgres:
+    image: postgres:15-alpine
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data/
+    env_file: ./.env-compose
+
+  minio:
+    image: minio/minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    env_file: ./.env-compose
+    command: server /data --console-address :9001
+    volumes:
+      - minio_data:/data
+
+volumes:
+  media_volume:
+  static_volume:
+#  postgres_data:
+  minio_data:

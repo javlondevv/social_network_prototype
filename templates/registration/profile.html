@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>{% block title %}Profile - {{ user.full_name }}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .profile-card {
+            border-radius: 0.75rem;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-picture img {
+            border-radius: 50%;
+            border: 2px solid #dee2e6;
+        }
+
+        .nav-link {
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            color: #007bff;
+        }
+
+        .alert-success {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'index' %}">Home</a>
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <form method="post" action="{% url 'logout' %}" class="form-inline">
+                        {% csrf_token %}
+                        <button class="btn btn-link nav-link" type="submit">Logout</button>
+                    </form>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<!-- Main Content -->
+{% block main_content %}
+    <div class="container px-4 mt-4">
+        <nav class="nav nav-borders">
+            <a class="nav-link active" href="{% url 'profile' %}">Profile</a>
+        </nav>
+        <hr class="mt-0 mb-4">
+
+        <!-- Success Message -->
+        {% if messages %}
+            <div class="alert alert-success" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data" class="needs-validation"
+              novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <!-- Profile Picture -->
+                <div class="col-xl-4">
+                    <div class="card mb-4 profile-card">
+                        <div class="card-header">Profile Picture</div>
+                        <div class="card-body text-center profile-picture">
+                            {% if user.avatar %}
+                                <img class="img-account-profile mb-2" src="{{ user.avatar.url }}" alt="Profile Picture"
+                                     width="150" height="150">
+                            {% else %}
+                                <img class="img-account-profile mb-2" src="https://via.placeholder.com/150"
+                                     alt="Default Profile Picture" width="150" height="150">
+                            {% endif %}
+                            <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+                            <input type="file" name="avatar" class="form-control-file mb-2"
+                                   accept="image/png, image/jpeg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Details -->
+                <div class="col-xl-8">
+                    <div class="card mb-4 profile-card">
+                        <div class="card-header">Account Details</div>
+                        <div class="card-body">
+                            <div class="row gx-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="small mb-1" for="inputFirstName">First Name</label>
+                                    <input class="form-control" id="inputFirstName" type="text" name="first_name"
+                                           value="{{ user.first_name }}" placeholder="Enter your first name" required>
+                                    <div class="invalid-feedback">Please provide a first name.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="small mb-1" for="inputLastName">Last Name</label>
+                                    <input class="form-control" id="inputLastName" type="text" name="last_name"
+                                           value="{{ user.last_name }}" placeholder="Enter your last name" required>
+                                    <div class="invalid-feedback">Please provide a last name.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small mb-1" for="inputUsername">Username</label>
+                                <input class="form-control" id="inputUsername" type="text" name="username"
+                                       value="{{ user.username }}" placeholder="Enter your username" required>
+                                <div class="invalid-feedback">Please provide a username.</div>
+                            </div>
+                            <button class="btn btn-info" type="submit">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Blog Post Cards - Bootdey.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 150px; 
+        }
+
+        .container {
+            padding: 10px;
+        }
+
+        .create-post-btn {
+            margin-top: 20px; 
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #ddd; 
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img-container {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-img-container img {
+            width: 100%; 
+            height: auto; 
+        }
+
+        .card-content {
+            padding: 15px;
+        }
+
+        .card-meta {
+            margin-bottom: 10px;
+        }
+
+        .card-meta .meta-date {
+            color: #888;
+        }
+
+        .card-meta .meta-pulse {
+            color: #007bff;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .navbar {
+            border-radius: 0;
+        }
+
+        .navbar-nav .nav-item {
+            margin-left: 10px;
+        }
+
+        .navbar-nav .nav-item:last-child {
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            font-weight: bold;
+        }
+
+        .filters {
+            margin-bottom: 20px;
+        }
+
+        .filters .btn {
+            margin-right: 5px;
+        }
+
+        .navbar {
+            border-radius: 0;
+            background-color: #f8f9fa; 
+            border-bottom: 1px solid #e7e7e7; 
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .navbar-nav > li > a {
+            padding: 15px 20px;
+            font-size: 16px;
+        }
+
+        .dropdown-menu {
+            width: 300px; 
+            padding: 15px;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            color: #333;
+            padding: 10px;
+            text-decoration: none;
+            border-bottom: 1px solid #ddd; 
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown-menu .no-notifications {
+            text-align: center;
+            color: #888;
+            padding: 10px;
+        }
+
+        .dropdown-menu .notification-item {
+            padding: 10px 0;
+        }
+
+        .dropdown-menu .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            background-color: #007bff;
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+
+        .btn-link {
+            color: #007bff; 
+            font-size: 16px;
+        }
+
+        .btn-link:hover {
+            color: #0056b3; 
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'index' %}">Home</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                   aria-expanded="false">
+                    <i class="fa fa-bell"></i>
+                    {% if likes_with_times %}
+                        <span class="badge">{{ likes_with_times|length }}</span>
+                    {% endif %}
+                </a>
+                <ul class="dropdown-menu">
+                    {% if likes_with_times %}
+                        {% for like in likes_with_times %}
+                            <li class="notification-item">
+                                <a href="{% url 'post_detail' like.post.pk %}">
+                                    <strong>{{ like.post.title }}</strong><br>
+                                    Liked by: {{ like.liked_by.username }}<br>
+                                    Liked on: {{ like.liked_time|date:"Y-m-d H:i:s" }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="no-notifications">No new notifications</li>
+                    {% endif %}
+                </ul>
+            </li>
+            {% if user.is_authenticated %}
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link navbar-btn">Logout</button>
+                </form>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Filters -->
+    <div class="filters">
+        <a href="?filter=all" class="btn btn-default {% if filter_type == 'all' %}active{% endif %}">All Posts</a>
+        <a href="?filter=my_posts" class="btn btn-default {% if filter_type == 'my_posts' %}active{% endif %}">My
+            Posts</a>
+        <a href="?filter=liked_posts" class="btn btn-default {% if filter_type == 'liked_posts' %}active{% endif %}">Liked
+            Posts</a>
+    </div>
+
+    <div class="row">
+        {#        {% for post in posts %}#}
+        {#            <div class="col-md-4">#}
+        {#                <div class="card card-favorite">#}
+        {#                    <div class="card-img-container">#}
+        {#                        <!-- Display image -->#}
+        {#                        <img src="{{ post.content.url }}" alt="Post Image" class="img-fluid">#}
+        {#                    </div>#}
+        {#                    <div class="card-content">#}
+        {#                        <div class="card-meta">#}
+        {#                            <span class="meta-date">{{ post.created_at }}</span>#}
+        {#                            <span class="meta-pulse">#}
+        {#                                <a href="#" class="card-share-number sharrre">{{ post.number_of_likes }} likes</a>#}
+        {#                            </span>#}
+        {#                        </div>#}
+        {#                        <h2>#}
+        {#                            <a href="{% url 'post_detail' post.pk %}">#}
+        {#                                {{ post.title }}#}
+        {#                            </a>#}
+        {#                        </h2>#}
+        {#                        <p>By {{ post.author.get_full_name }}</p> <!-- Author's full name -->#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        {% endfor %}#}
+
+        {% for post in posts %}
+            <div class="col-md-4">
+                <div class="card card-favorite">
+                    <div class="card-img-container">
+                        {% if post.content %}
+                            {% if post.is_image %}
+                                <img src="{{ post.content.url }}" alt="Post Image" class="img-fluid">
+                            {% elif post.is_video %}
+                                <video controls class="img-fluid">
+                                    <source src="{{ post.content.url }}"
+                                            type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% else %}
+                                <p>Unsupported media type.</p>
+                            {% endif %}
+                        {% else %}
+                            <p>No content available</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="meta-date">{{ post.created_at }}</span>
+                            <span class="meta-pulse">
+                        <a href="#" class="card-share-number sharrre">{{ post.number_of_likes }} likes</a>
+                    </span>
+                        </div>
+                        <h2>
+                            <a href="{% url 'post_detail' post.pk %}">
+                                {{ post.title }}
+                            </a>
+                        </h2>
+                        <p>By {{ post.author.get_full_name }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+
+    </div>
+
+    <a href="{% url 'create_post' %}" class="btn btn-primary create-post-btn">Create New Post</a>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li>
+                    <a href="?page=1" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="disabled"><span>&laquo;&laquo;</span></li>
+                <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+
+            {% for num in pagination_range %}
+                {% if num == page_obj.number %}
+                    <li class="active"><span>{{ num }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li><a href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li>
+                    <a href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="disabled"><span>&raquo;</span></li>
+                <li class="disabled"><span>&raquo;&raquo;</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>

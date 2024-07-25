@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'index' %}">Home</a>
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div class="container px-4 mt-4">
+    <h1 class="mb-4">{{ post.title }}</h1>
+    <div class="card mb-4">
+        <div class="card-header">{{ post.title }}</div>
+        <div class="card-body">
+            <!-- Post Image -->
+            {% if post.content %}
+                <img src="{{ post.content.url }}" alt="Post Image" class="img-fluid mb-3">
+            {% endif %}
+            <!-- Post Metadata -->
+            <div class="d-flex justify-content-between">
+                <span>Total Likes: {{ post.number_of_likes }}</span>
+                <span>Created At: {{ post.created_at }}</span>
+            </div>
+            {% if user.is_authenticated %}
+                <form action="{% url 'blogpost_like' post.id %}" method="post">
+                    {% csrf_token %}
+                    {% if post_is_liked %}
+                        <button type="submit" name="blogpost_id" value="{{ post.id }}" class="btn btn-info">Unlike</button>
+                    {% else %}
+                        <button type="submit" name="blogpost_id" value="{{ post.id }}" class="btn btn-info">Like</button>
+                    {% endif %}
+                </form>
+            {% else %}
+                <a class="btn btn-outline-info" href="{% url 'login' %}?next={{ request.path }}">Log in to like this article!</a><br>
+            {% endif %}
+            <strong class="text-secondary">{{ number_of_likes }} Like{{ number_of_likes|pluralize }}</strong>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
