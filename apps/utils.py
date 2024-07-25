@@ -35,5 +35,3 @@ class VideoPreviewAdminWidget(FileInput):
             output.append(video_html)
         output.append(super().render(name, value, attrs, renderer))
         return format_html("".join(output))
-
-

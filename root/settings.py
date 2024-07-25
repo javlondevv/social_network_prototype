@@ -19,13 +19,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "apps.apps.AppsConfig",
-    'storages',
-    'boto3'
+    "storages",
+    "boto3",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -55,10 +55,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "root.wsgi.application"
 # ASGI_APPLICATION = 'root.asgi.application'
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
@@ -96,7 +96,7 @@ AUTH_PASSWORD_VALIDATORS = [
 WEBPUSH_SETTINGS = {
     "VAPID_PUBLIC_KEY": "BEkzxGtJJiWIRc616DWPieOxBMULD8A6I3M0xuq1AR3sk6u3UgdwUKl_OEH-55nt6aN6VMZdbSdbAY2XxsaYxGE",
     "VAPID_PRIVATE_KEY": "cCr52OGD7xht8C8e4X297LU1uUrmr2Ac4z__aIQqS1c",
-    "VAPID_ADMIN_EMAIL": "baxtiyorovjavlon8@gmail.com"
+    "VAPID_ADMIN_EMAIL": "baxtiyorovjavlon8@gmail.com",
 }
 # import logging
 #
@@ -141,24 +141,27 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")  # noqa
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/login/"
 
 # MinIO settings
-MINIO_ENDPOINT = os.environ.get('MINIO_ENDPOINT')
-MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY')
-MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY')
-MINIO_BUCKET_NAME = os.environ.get('MINIO_BUCKET_NAME')
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY")
+MINIO_BUCKET_NAME = os.environ.get("MINIO_BUCKET_NAME")
 MINIO_CONSISTENCY_CHECK_ON_START = bool(
-    os.environ.get("MINIO_CONSISTENCY_CHECK_ON_START", default="False").lower() == "true")
+    os.environ.get("MINIO_CONSISTENCY_CHECK_ON_START", default="False").lower()
+    == "true"
+)
 
-DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE')
-AWS_S3_ENDPOINT_URL = f'http://{MINIO_ENDPOINT}'
+DEFAULT_FILE_STORAGE = os.environ.get("DEFAULT_FILE_STORAGE")
+AWS_S3_ENDPOINT_URL = f"http://{MINIO_ENDPOINT}"
 AWS_ACCESS_KEY_ID = MINIO_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY = MINIO_SECRET_KEY
 AWS_STORAGE_BUCKET_NAME = MINIO_BUCKET_NAME
 AWS_S3_FILE_OVERWRITE = bool(
-    os.environ.get("AWS_S3_FILE_OVERWRITE", default="False").lower() == "true")
+    os.environ.get("AWS_S3_FILE_OVERWRITE", default="False").lower() == "true"
+)
 AWS_DEFAULT_ACL = None
 
 # DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"

@@ -5,7 +5,11 @@ from django.db.models import (
     ForeignKey,
     PositiveIntegerField,
     CharField,
-    CASCADE, DateTimeField, ImageField, FileField, )
+    CASCADE,
+    DateTimeField,
+    ImageField,
+    FileField,
+)
 from django.utils import timezone
 
 from apps.utils import generate_unique_filename
@@ -37,6 +41,7 @@ class User(AbstractUser):
         phone (CharField): The user's phone number.
         date_joined (DateTimeField): The date and time when the user joined.
     """
+
     avatar = ImageField(upload_to=generate_unique_filename, blank=True, null=True)
     liked_posts = ManyToManyField("Post", related_name="liked_by", blank=True)
     phone = CharField(max_length=15, blank=True, null=True)
@@ -44,7 +49,7 @@ class User(AbstractUser):
 
     @property
     def full_name(self):
-        return f'{self.first_name} {self.last_name}'
+        return f"{self.first_name} {self.last_name}"
 
 
 class Like(CreatedBaseModel):
@@ -58,11 +63,12 @@ class Like(CreatedBaseModel):
     Meta:
         unique_together (tuple): Ensures each user can like a post only once.
     """
-    user = ForeignKey('User', on_delete=CASCADE, related_name='likes')
-    post = ForeignKey('Post', on_delete=CASCADE, related_name='likes')
+
+    user = ForeignKey("User", on_delete=CASCADE, related_name="likes")
+    post = ForeignKey("Post", on_delete=CASCADE, related_name="likes")
 
     class Meta:
-        unique_together = ('user', 'post')
+        unique_together = ("user", "post")
 
 
 class Post(CreatedBaseModel):
@@ -79,6 +85,7 @@ class Post(CreatedBaseModel):
         update_likes_count: Updates the likes count of the post.
         number_of_likes: Returns the number of likes the post has.
     """
+
     title = CharField(max_length=255)
     content = FileField(upload_to=generate_unique_filename, blank=True, null=True)
     author = ForeignKey("User", related_name="posts", on_delete=CASCADE)
@@ -86,11 +93,11 @@ class Post(CreatedBaseModel):
 
     @property
     def is_image(self):
-        return self.content.name.lower().endswith(('png', 'jpg', 'jpeg', 'gif'))
+        return self.content.name.lower().endswith(("png", "jpg", "jpeg", "gif"))
 
     @property
     def is_video(self):
-        return self.content.name.lower().endswith(('mp4', 'mov', 'avi'))
+        return self.content.name.lower().endswith(("mp4", "mov", "avi"))
 
     def update_likes_count(self):
         self.likes_count = self.likes.count()
