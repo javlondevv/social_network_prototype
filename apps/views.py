@@ -183,15 +183,11 @@ class PostListView(ListView):
 
         if filter_type == "my_posts" and user.is_authenticated:
             queryset = queryset.filter(author=user)
-            for post in queryset:
-                print(f"Title: {post.title}, Content: {post.content.url}")
         elif filter_type == "liked_posts" and user.is_authenticated:
             liked_post_ids = Like.objects.filter(user=user).values_list(
                 "post_id", flat=True
             )
             queryset = queryset.filter(id__in=liked_post_ids)
-            for post in queryset:
-                print(f"Title: {post.title}, Content: {post.content.url}")
         return queryset
 
     def get_last_liked_posts_as_notifications(self):
