@@ -48,15 +48,39 @@ A social network prototype built using Django that allows users to register, log
     cd social-network-prototype
     ```
 
-2. Create a `.env-compose` file with the following content:
 
-    ```env
-    POSTGRES_DB=yourdbname
-    POSTGRES_USER=yourdbuser
-    POSTGRES_PASSWORD=yourdbpassword
-    MINIO_ROOT_USER=minioadmin
-    MINIO_ROOT_PASSWORD=minioadmin
-    ```
+# 2. Environment Configuration
+
+This document provides the configuration settings for the `.env-compose` file required for your Django project. 
+
+## `.env-compose` Configuration
+
+Create a file named `.env-compose` in your project directory and add the following content:
+
+```env
+SECRET_KEY=django-insecure-^xn9cj!e+)q_t8b-ttbe8cka=1s#s==%#m5(l(xsqt($f*!ag!
+DEBUG=True
+ALLOWED_HOSTS=*
+DB_NAME=social_db
+DB_USER=social_user
+DB_PASS=pL2aM2tS1kpL
+DB_PORT=5432
+DB_HOST=postgres
+POSTGRES_USER=social_user
+POSTGRES_DB=social_db
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_PASSWORD=pL2aM2tS1kpL
+DB_ENGINE=django.db.backends.postgresql_psycopg2
+MINIO_ENDPOINT=minio:9000
+EXTERNAL_MINIO_ENDPOINT=localhost:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET_NAME=mybucket
+MINIO_CONSISTENCY_CHECK_ON_START=True
+DEFAULT_FILE_STORAGE=storages.backends.s3boto3.S3Boto3Storage
+AWS_S3_FILE_OVERWRITE=False
+```
 
 3. Build and start the containers:
 
