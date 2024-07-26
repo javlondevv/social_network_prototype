@@ -1,16 +1,9 @@
 from django.urls import path
 
 from apps import views
-from apps.views import (
-    RegisterPageView,
-    LoginPageView,
-    index_page_view,
-    PostListView,
-    PostCreateView,
-    PostDetailView,
-    UserLogoutView,
-    ProfileView,
-)
+from apps.views import (LoginPageView, NotificationsView, PostCreateView,
+                        PostDetailView, PostListView, ProfileView,
+                        RegisterPageView, UserLogoutView, index_page_view)
 
 urlpatterns = [
     path("", index_page_view, name="index"),
@@ -22,4 +15,5 @@ urlpatterns = [
     path("posts/like/<int:pk>/", views.BlogPostLike, name="blogpost_like"),
     path("logout/", UserLogoutView.as_view(next_page="login"), name="logout"),
     path("profile-update/", ProfileView.as_view(), name="profile"),
+    path("notifications/", NotificationsView.as_view(), name="notifications"),
 ]

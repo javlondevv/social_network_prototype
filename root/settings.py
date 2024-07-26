@@ -1,9 +1,10 @@
 import os
 from pathlib import Path
 
+from django.conf import settings
 from dotenv import load_dotenv
 from storages.backends.s3boto3 import S3Boto3Storage
-from django.conf import settings
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
@@ -26,7 +27,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -168,7 +169,6 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
 
 
-
 # MinIO settings
 MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
 MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY")
@@ -180,7 +180,7 @@ MINIO_CONSISTENCY_CHECK_ON_START = bool(
 )
 
 # DEFAULT_FILE_STORAGE = os.environ.get("DEFAULT_FILE_STORAGE")
-DEFAULT_FILE_STORAGE = 'apps.custom_storage.CustomS3Boto3Storage'
+DEFAULT_FILE_STORAGE = "apps.custom_storage.CustomS3Boto3Storage"
 AWS_S3_ENDPOINT_URL = f"http://{MINIO_ENDPOINT}"
 AWS_ACCESS_KEY_ID = MINIO_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY = MINIO_SECRET_KEY

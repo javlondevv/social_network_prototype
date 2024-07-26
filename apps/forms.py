@@ -1,10 +1,10 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.db.transaction import atomic
 from django.forms import ModelForm
 
-from .models import User, Post
+from .models import Post, User
 
 
 class UserRegisterForm(UserCreationForm):

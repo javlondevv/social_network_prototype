@@ -3,13 +3,17 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.http import HttpResponseNotAllowed
-from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponseNotAllowed, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import FormView, ListView, CreateView, DetailView, UpdateView
+from django.views import View
+from django.views.generic import (CreateView, DetailView, FormView, ListView,
+                                  UpdateView)
 
-from .forms import UserRegisterForm, LoginForm, PostForm, UserForm
-from .models import Post, Like
+from .forms import LoginForm, PostForm, UserForm, UserRegisterForm
+from .models import Like, Post
+
+logger = logging.getLogger(__name__)
 
 
 def index_page_view(request):
@@ -80,10 +84,6 @@ class UserLogoutView(LogoutView):
     """
 
     next_page = reverse_lazy("login")
-
-
-# Configure logging
-logger = logging.getLogger(__name__)
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -163,14 +163,6 @@ class PostDetailView(LoginRequiredMixin, DetailView):
 
 
 class PostListView(ListView):
-    """
-    Class representing a list view of blog posts.
-    Methods:
-        get_queryset: Returns the queryset of posts based on filter criteria.
-        get_last_liked_posts_as_notifications: Retrieves the last liked posts with details for notifications.
-        get_context_data: Updates the context with pagination information and last liked posts.
-    """
-
     template_name = "blog_list.html"
     context_object_name = "posts"
     paginate_by = 5
@@ -190,22 +182,6 @@ class PostListView(ListView):
             queryset = queryset.filter(id__in=liked_post_ids)
         return queryset
 
-    def get_last_liked_posts_as_notifications(self):
-        user = self.request.user
-        last_likes = Like.objects.filter(post__author=user).order_by("-created_at")[:5]
-
-        if not last_likes.exists():
-            return Post.objects.none(), []
-
-        liked_posts = Post.objects.filter(
-            id__in=last_likes.values_list("post_id", flat=True)
-        ).distinct()
-        likes_with_times = [
-            {"post": like.post, "liked_time": like.created_at, "liked_by": like.user}
-            for like in last_likes
-        ]
-        return liked_posts, likes_with_times
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
         pagination = context["page_obj"]
@@ -220,11 +196,39 @@ class PostListView(ListView):
         context["pagination_range"] = range(left, right)
         context["filter_type"] = self.request.GET.get("filter", "all")
 
-        liked_posts, likes_with_times = self.get_last_liked_posts_as_notifications()
-        context["liked_posts"] = liked_posts
-        context["likes_with_times"] = likes_with_times
-
         return context
+
+
+class NotificationsView(LoginRequiredMixin, View):
+    """
+    Handles the GET request to retrieve the user's last 5 likes with details like post title, URL, user who liked, and time of like.
+
+    Parameters:
+        request (HttpRequest): The request object.
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
+
+    Returns:
+        JsonResponse: JSON response containing details of the last 5 likes with timestamps.
+    """
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        last_likes = Like.objects.filter(post__author=user).order_by("-created_at")[:5]
+
+        if not last_likes.exists():
+            return JsonResponse({"likes_with_times": []})
+
+        likes_with_times = [
+            {
+                "post_title": like.post.title,
+                "post_url": request.build_absolute_uri(like.post.get_absolute_url()),
+                "liked_by": like.user.username,
+                "liked_time": like.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+            for like in last_likes
+        ]
+        return JsonResponse({"likes_with_times": likes_with_times})
 
 
 class ProfileView(LoginRequiredMixin, UpdateView):

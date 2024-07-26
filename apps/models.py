@@ -1,15 +1,8 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import (
-    Model,
-    ManyToManyField,
-    ForeignKey,
-    PositiveIntegerField,
-    CharField,
-    CASCADE,
-    DateTimeField,
-    ImageField,
-    FileField,
-)
+from django.db.models import (CASCADE, CharField, DateTimeField, FileField,
+                              ForeignKey, ImageField, ManyToManyField, Model,
+                              PositiveIntegerField)
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.utils import generate_unique_filename
@@ -106,6 +99,9 @@ class Post(CreatedBaseModel):
     @property
     def number_of_likes(self):
         return self.likes.count()
+
+    def get_absolute_url(self):
+        return reverse("post_detail", kwargs={"pk": self.pk})
 
 
 class Notification(CreatedBaseModel):

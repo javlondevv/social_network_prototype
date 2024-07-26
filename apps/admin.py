@@ -3,7 +3,7 @@ from django.db.models import ImageField
 from django.utils.html import format_html
 
 from . import utils
-from .models import User, Post, Notification
+from .models import Notification, Post, User
 
 
 @admin.register(User)

@@ -321,6 +321,42 @@
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $(".dropdown-toggle").click(function(event) {
+        event.preventDefault();
+        var dropdownMenu = $(this).next('.dropdown-menu');
+
+        if (dropdownMenu.find('.notification-item').length === 0) {
+            $.ajax({
+                url: "{% url 'notifications' %}",
+                method: "GET",
+                success: function(response) {
+                    var notificationItems = '';
+
+                    if (response.likes_with_times.length > 0) {
+                        response.likes_with_times.forEach(function(like) {
+                            notificationItems += '<li class="notification-item">' +
+                                '<a href="' + like.post_url + '">' +
+                                '<strong>' + like.post_title + '</strong><br>' +
+                                'Liked by: ' + like.liked_by + '<br>' +
+                                'Liked on: ' + like.liked_time +
+                                '</a>' +
+                                '</li>';
+                        });
+                    } else {
+                        notificationItems = '<li class="no-notifications">No new notifications</li>';
+                    }
+
+                    dropdownMenu.html(notificationItems);
+                }
+            });
+        }
+    });
+});
+</script>
 
 </body>
 </html>

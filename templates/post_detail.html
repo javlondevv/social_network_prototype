@@ -32,7 +32,17 @@
         <div class="card-body">
             <!-- Post Image -->
             {% if post.content %}
-                <img src="{{ post.content.url }}" alt="Post Image" class="img-fluid mb-3">
+                {% if post.is_image %}
+                    <img src="{{ post.content.url }}" alt="Post Image" class="img-fluid mb-3">
+                {% elif post.is_video %}
+                    <video controls class="img-fluid">
+                        <source src="{{ post.content.url }}"
+                                type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% else %}
+                    <p>Unsupported media type.</p>
+                {% endif %}
             {% endif %}
             <!-- Post Metadata -->
             <div class="d-flex justify-content-between">
@@ -43,13 +53,16 @@
                 <form action="{% url 'blogpost_like' post.id %}" method="post">
                     {% csrf_token %}
                     {% if post_is_liked %}
-                        <button type="submit" name="blogpost_id" value="{{ post.id }}" class="btn btn-info">Unlike</button>
+                        <button type="submit" name="blogpost_id" value="{{ post.id }}" class="btn btn-info">Unlike
+                        </button>
                     {% else %}
-                        <button type="submit" name="blogpost_id" value="{{ post.id }}" class="btn btn-info">Like</button>
+                        <button type="submit" name="blogpost_id" value="{{ post.id }}" class="btn btn-info">Like
+                        </button>
                     {% endif %}
                 </form>
             {% else %}
-                <a class="btn btn-outline-info" href="{% url 'login' %}?next={{ request.path }}">Log in to like this article!</a><br>
+                <a class="btn btn-outline-info" href="{% url 'login' %}?next={{ request.path }}">Log in to like this
+                    article!</a><br>
             {% endif %}
             <strong class="text-secondary">{{ number_of_likes }} Like{{ number_of_likes|pluralize }}</strong>
         </div>
