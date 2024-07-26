@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-
+from storages.backends.s3boto3 import S3Boto3Storage
+from django.conf import settings
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
@@ -21,9 +22,11 @@ INSTALLED_APPS = [
     "apps.apps.AppsConfig",
     "storages",
     "boto3",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -33,6 +36,14 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = default_headers + ("custom-headers",)
+CORS_ORIGIN_WHITELIST = (
+    "http://minio:9001",
+    "http://minio:9000",
+)
+
 
 ROOT_URLCONF = "root.urls"
 
@@ -67,6 +78,27 @@ DATABASES = {
         "PORT": os.environ.get("DB_PORT"),
     }
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://localhost:9000",
+#     "http://localhost:3001",
+#     "http://localhost:9001",
+#     "http://127.0.0.1:3000",
+#     "http://127.0.0.1:3001",
+#     "http://95.46.96.95:80",
+# ]
+
+
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -127,16 +159,15 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")  # noqa
 #
-MEDIA_URL = "media/"
-
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")  # noqa
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+# MEDIA_URL = "media/"
+#
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media")  # noqa
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
+
+
 
 # MinIO settings
 MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT")
@@ -148,7 +179,8 @@ MINIO_CONSISTENCY_CHECK_ON_START = bool(
     == "true"
 )
 
-DEFAULT_FILE_STORAGE = os.environ.get("DEFAULT_FILE_STORAGE")
+# DEFAULT_FILE_STORAGE = os.environ.get("DEFAULT_FILE_STORAGE")
+DEFAULT_FILE_STORAGE = 'apps.custom_storage.CustomS3Boto3Storage'
 AWS_S3_ENDPOINT_URL = f"http://{MINIO_ENDPOINT}"
 AWS_ACCESS_KEY_ID = MINIO_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY = MINIO_SECRET_KEY
@@ -158,12 +190,5 @@ AWS_S3_FILE_OVERWRITE = bool(
 )
 AWS_DEFAULT_ACL = None
 
-# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-# AWS_ACCESS_KEY_ID = os.environ.get("MINIO_ACCESS_KEY", "access-key")
-# AWS_SECRET_ACCESS_KEY = os.environ.get("MINIO_SECRET_KEY", "secret-key")
-# AWS_STORAGE_BUCKET_NAME = os.environ.get("MINIO_BUCKET_NAME", "my-local-bucket")
-# AWS_S3_ENDPOINT_URL = os.environ.get('MINIO_ENDPOINT_URL')
-# AWS_QUERYSTRING_AUTH = True
-# MINIO_CONSISTENCY_CHECK_ON_START = True
-
-# AWS_S3_FILE_OVERWRITE = False
+EXTERNAL_MINIO_ENDPOINT = os.environ.get("EXTERNAL_MINIO_ENDPOINT")
+EXTERNAL_AWS_S3_ENDPOINT_URL = f"http://{EXTERNAL_MINIO_ENDPOINT}"
